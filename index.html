@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Umbrella — Remote Admin & Technical Support</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F1ECDE;
+    --paper-deep: #E7DFC8;
+    --card: #FFFFFF;
+    --ink: #23201A;
+    --ink-soft: #5B5346;
+    --stamp: #2F6F5E;
+    --stamp-deep: #234F42;
+    --stamp-wash: #DCE8E3;
+    --line: rgba(35,32,26,0.22);
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3{ margin:0; font-family: var(--mono); line-height: 1.15; }
+  p{ margin:0; }
+  ul{ margin:0; padding:0; list-style:none; }
+  a{ color: inherit; }
+
+  .wrap{ max-width: 1040px; margin:0 auto; padding: 0 26px; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible{
+    outline: 2px solid var(--stamp);
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+
+  /* ---------- perforation divider ---------- */
+  .perf{ display:flex; gap:10px; justify-content:center; }
+  .perf span{
+    width:7px; height:7px;
+    border-radius:50%;
+    background: var(--paper-deep);
+    border: 1px solid var(--line);
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    background: var(--paper);
+    border-bottom: 1px dashed var(--line);
+    position: sticky;
+    top:0;
+    z-index: 30;
+  }
+  .nav-row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 18px 0;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  nav.primary-nav{ display:flex; gap: 26px; }
+  nav.primary-nav a{
+    text-decoration:none;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+  }
+  nav.primary-nav a:hover{ color: var(--ink); border-color: var(--stamp); }
+  .nav-toggle{
+    display:none;
+    background: none;
+    border: 1px solid var(--line);
+    padding: 8px 12px;
+    border-radius: 2px;
+    font-family: var(--mono);
+    cursor:pointer;
+  }
+  @media (max-width: 720px){
+    nav.primary-nav{
+      display:none;
+      position:absolute; top:100%; left:0; right:0;
+      background: var(--paper);
+      flex-direction:column;
+      padding: 6px 26px 20px;
+      border-bottom: 1px dashed var(--line);
+    }
+    nav.primary-nav.open{ display:flex; }
+    nav.primary-nav a{ padding: 10px 0; border-bottom: 1px dashed var(--line); }
+    .nav-toggle{ display:inline-block; }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding: 72px 0 60px; }
+  .ticket-head{
+    display:flex;
+    justify-content: space-between;
+    align-items:flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .stamp-badge{
+    display:inline-flex;
+    align-items:center;
+    border: 2px solid var(--stamp);
+    color: var(--stamp-deep);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 3px;
+    transform: rotate(-2deg);
+    opacity:0;
+    animation: stampDown 0.5s 0.15s cubic-bezier(.2,.8,.3,1.3) forwards;
+  }
+  @keyframes stampDown{
+    0%{ opacity:0; transform: rotate(-2deg) scale(1.6); }
+    100%{ opacity:1; transform: rotate(-2deg) scale(1); }
+  }
+  .ticket-ref{
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    padding-top: 8px;
+  }
+  .hero h1{
+    font-size: clamp(1.9rem, 4.6vw, 3rem);
+    font-weight: 700;
+    max-width: 16ch;
+    letter-spacing: -0.01em;
+  }
+  .hero-sub{
+    margin-top: 20px;
+    max-width: 56ch;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+  }
+  .hero-actions{
+    margin-top: 30px;
+    display:flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .btn{
+    display:inline-block;
+    text-decoration:none;
+    font-weight: 600;
+    font-size: 0.94rem;
+    padding: 13px 22px;
+    border-radius: 2px;
+    cursor:pointer;
+    border: 1px solid transparent;
+    font-family: var(--sans);
+  }
+  .btn-stamp{ background: var(--stamp); color: #fff; }
+  .btn-stamp:hover{ background: var(--stamp-deep); }
+  .btn-outline{ color: var(--ink); border-color: var(--ink); background: transparent; }
+  .btn-outline:hover{ border-color: var(--stamp); color: var(--stamp-deep); }
+
+  /* ---------- SECTIONS ---------- */
+  .section{ padding: 56px 0; }
+  .section-label{
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .section h2{
+    font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+    font-weight: 700;
+    margin-bottom: 36px;
+  }
+
+  /* ---------- SERVICE CARDS ---------- */
+  .service-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 34px;
+  }
+  .card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 28px 26px;
+    box-shadow: 0 10px 24px rgba(35,32,26,0.09);
+  }
+  .card.tilt-a{ transform: rotate(-1.1deg); }
+  .card.tilt-b{ transform: rotate(0.9deg); }
+  .card-ref{
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--stamp-deep);
+    background: var(--stamp-wash);
+    display:inline-block;
+    padding: 3px 9px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+  }
+  .card h3{ font-size: 1.25rem; margin-bottom: 10px; }
+  .card > p{ color: var(--ink-soft); max-width: 40ch; }
+  .card-rate{
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
+  }
+  .card-tasks{ margin-top: 16px; }
+  .card-tasks li{
+    position:relative;
+    padding-left: 20px;
+    margin-bottom: 8px;
+    font-size: 0.92rem;
+  }
+  .card-tasks li::before{
+    content: "×";
+    position:absolute; left:0; top:-1px;
+    font-family: var(--mono);
+    color: var(--stamp);
+  }
+  @media (max-width: 780px){
+    .service-grid{ grid-template-columns: 1fr; }
+    .card.tilt-a, .card.tilt-b{ transform: none; }
+  }
+
+  /* ---------- ABOUT ---------- */
+  .about-grid{
+    display:grid;
+    grid-template-columns: 0.75fr 1.25fr;
+    gap: 40px;
+    align-items: start;
+  }
+  .file-photo{
+    position:relative;
+    width:100%;
+    max-width: 290px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: var(--card);
+    padding: 10px 10px 38px;
+    box-shadow: 0 10px 24px rgba(35,32,26,0.09);
+    transform: rotate(-1deg);
+  }
+  .file-photo .frame{
+    aspect-ratio: 4/5;
+    overflow:hidden;
+    background: var(--paper-deep);
+  }
+  .file-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .file-photo .caption{
+    position:absolute;
+    bottom: 12px; left:10px; right:10px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+  .about-copy{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 30px;
+    box-shadow: 0 10px 24px rgba(35,32,26,0.06);
+  }
+  .about-copy p{ margin-bottom: 15px; max-width: 62ch; color: var(--ink-soft); }
+  .about-copy p:last-child{ margin-bottom:0; }
+  .about-copy strong{ color: var(--ink); }
+  @media (max-width: 780px){
+    .about-grid{ grid-template-columns: 1fr; }
+    .file-photo{ max-width: 220px; }
+  }
+
+  /* ---------- CONTACT ---------- */
+  .dispatch{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    box-shadow: 0 10px 24px rgba(35,32,26,0.08);
+    padding: 8px;
+  }
+  .dispatch-inner{
+    border: 1px dashed var(--line);
+    border-radius: 2px;
+    padding: 32px;
+    display:grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 40px;
+  }
+  .contact-info dl{
+    display:grid;
+    grid-template-columns: auto 1fr;
+    gap: 9px 16px;
+    margin-bottom: 26px;
+  }
+  .contact-info dt{ font-family: var(--mono); font-size: 0.78rem; color: var(--stamp-deep); padding-top:2px; }
+  .contact-info dd{ margin:0; }
+  .contact-info a{ text-decoration: underline; text-decoration-color: var(--line); }
+  .contact-info a:hover{ text-decoration-color: var(--stamp); }
+  .contact-note{ color: var(--ink-soft); font-size: 0.92rem; max-width: 38ch; }
+
+  form.contact-form{ display:grid; gap: 16px; }
+  .field{ display:grid; gap:6px; }
+  .field label{ font-size: 0.85rem; color: var(--ink-soft); font-family: var(--mono); }
+  .field input, .field select, .field textarea{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 11px 13px;
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+  .field textarea{ resize:vertical; min-height: 100px; }
+  .row-2{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 780px){
+    .dispatch-inner{ grid-template-columns: 1fr; padding: 22px; }
+    .row-2{ grid-template-columns: 1fr; }
+  }
+  .form-status{ font-family: var(--mono); font-size: 0.85rem; color: var(--stamp-deep); display:none; margin-top: 6px; }
+  .form-status.visible{ display:block; }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top: 1px dashed var(--line);
+    padding: 24px 0;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+  footer .wrap{ display:flex; justify-content: space-between; flex-wrap:wrap; gap:8px; font-family: var(--mono); }
+
+  /* ---------- WHATSAPP TAB ---------- */
+  .whatsapp-tab{
+    position: fixed;
+    right: 0;
+    top: 60%;
+    transform: translateY(-50%);
+    background: #25D366;
+    color: #fff;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding: 12px 16px 12px 14px;
+    border-radius: 6px 0 0 6px;
+    box-shadow: -4px 4px 14px rgba(0,0,0,0.18);
+    z-index: 50;
+    text-decoration:none;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+  .whatsapp-tab svg{ width:20px; height:20px; flex-shrink:0; }
+  .whatsapp-tab span{ display:none; }
+  @media (min-width: 640px){ .whatsapp-tab span{ display:inline; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav-row">
+    <div class="brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.5 2 2 6.8 2 12.5h4.2c0-3.2 2.6-6 5.8-6s5.8 2.8 5.8 6H22C22 6.8 17.5 2 12 2Z" fill="#2F6F5E"/>
+        <path d="M12 12.5V20" stroke="#23201A" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      Digital Umbrella
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav">Menu</button>
+    <nav class="primary-nav" id="primaryNav">
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="ticket-head">
+      <span class="stamp-badge">Open for work</span>
+      <span class="ticket-ref">Remote admin &amp; technical support · Scotland</span>
+    </div>
+    <h1>What is Digital Umbrella?</h1>
+    <p class="hero-sub">A reliable remote service providing everyday business admin and technical support saving you time, reducing overheads and keeping your business running smoothly without the cost or commitment of additional staff.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn btn-stamp">Get in touch</a>
+      <a href="#services" class="btn btn-outline">See what's covered</a>
+    </div>
+  </div>
+</section>
+
+<div class="perf"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<section class="section" id="services">
+  <div class="wrap">
+    <div class="section-label">What's covered</div>
+    <h2>Two areas, priced differently</h2>
+    <div class="service-grid">
+      <div class="card tilt-a">
+        <span class="card-ref">DU–01</span>
+        <h3>Administrative &amp; office support</h3>
+        <p>The steady, ongoing work that keeps a business running - handled so it's off your desk for good.</p>
+        <ul class="card-tasks">
+          <li>Inbox and calendar management</li>
+          <li>Data entry and document formatting</li>
+          <li>Scheduling and travel bookings</li>
+          <li>Customer correspondence</li>
+          <li>Research and reporting</li>
+          <li>Meeting notes and follow-ups</li>
+        </ul>
+        <div class="card-rate">Standard rate · from $18/hour</div>
+      </div>
+      <div class="card tilt-b">
+        <span class="card-ref">DU–02</span>
+        <h3>Technical assistance</h3>
+        <p>For the tasks that need a steadier technical hand - priced for the extra expertise involved.</p>
+        <ul class="card-tasks">
+          <li>Software setup and troubleshooting</li>
+          <li>Device and account configuration</li>
+          <li>Website and platform support</li>
+          <li>Systems and workflow setup</li>
+          <li>Onboarding new tools and apps</li>
+          <li>Ongoing light-touch IT support</li>
+        </ul>
+        <div class="card-rate">Specialist rate · from $30/hour</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="perf"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<section class="section" id="about">
+  <div class="wrap">
+    <div class="section-label">Who you're working with</div>
+    <h2>Based in Scotland, working with clients anywhere</h2>
+    <div class="about-grid">
+      <div class="file-photo">
+        <div class="frame">
+          <img src="images/4-5headshot.png" alt="Jonathan Vieira portrait headshot" loading="lazy">
+        </div>
+        <div class="caption">Jonathan Vieira — Scotland</div>
+      </div>
+      <div class="about-copy">
+        <p><strong>Digital Umbrella</strong> is run entirely by me, Jonathan Vieira. No account managers and no hand-offs. When you hire Digital Umbrella, you work directly with me.</p>
+        <p>I provide reliable support across two key areas: taking care of the recurring admin that eats into your working day, and providing technical assistance when something needs a more experienced, hands-on approach.</p>
+        <p>Based in Scotland and working fully remotely, I offer flexible support to businesses wherever they're based, with hours that can accommodate clients across different time zones.</p>
+        <p>Being bi-lingual, I can provide support in English and Spanish, making Digital Umbrella a practical choice for businesses working across international markets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="perf"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+<section class="section" id="contact">
+  <div class="wrap">
+    <div class="section-label">Usually replies within a day</div>
+    <h2>Get in touch</h2>
+    <div class="dispatch">
+      <div class="dispatch-inner">
+        <div class="contact-info">
+          <dl>
+            <dt>Email</dt>
+            <dd><a href="mailto:digitalumbrella@proton.me">digitalumbrella@proton.me</a></dd>
+            <dt>Phone</dt>
+            <dd><a href="tel:+447377877361">+44 7377877361</a></dd>
+            <dt>Business from</dt>
+            <dd>Scotland, UK — remote worldwide</dd>
+          </dl>
+          <p class="contact-note">Not sure which service fits? Send a short note about the task and a starting point will come back with it.</p>
+        </div>
+        <form class="contact-form" id="contactForm">
+          <div class="row-2">
+            <div class="field">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="Your name" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="you@example.com" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="service">What do you need help with?</label>
+            <select id="service" name="service">
+              <option>Administrative &amp; office support</option>
+              <option>Technical assistance</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="A little about the task" required></textarea>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-stamp">Send message</button>
+            <p class="form-status" id="formStatus">Thanks! Your email app should have opened with this message ready to send.</p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Digital Umbrella - Jonathan Vieira, Scotland</span>
+    <span>© 2026</span>
+  </div>
+</footer>
+
+<a class="whatsapp-tab" href="https://wa.me/447377877361?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20Digital%20Umbrella" target="_blank" rel="noopener" aria-label="Message on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C6.5 2 2 6.4 2 11.8c0 2 .6 3.9 1.6 5.5L2 22l4.9-1.5c1.5.8 3.3 1.3 5.1 1.3 5.5 0 10-4.4 10-9.8C22 6.4 17.5 2 12 2Zm0 17.8c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-2.9.9.9-2.8-.2-.3C4.4 15 3.8 13.4 3.8 11.8 3.8 7.4 7.4 3.8 12 3.8s8.2 3.6 8.2 8c0 4.4-3.7 8-8.2 8Zm4.5-6c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.2.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.2.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9 0 1.1.8 2.2.9 2.4.1.2 1.6 2.5 4 3.4.6.2 1 .4 1.3.5.6.2 1.1.2 1.5.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3Z"/>
+  </svg>
+  <span>WhatsApp</span>
+</a>
+
+<script>
+  const navToggle = document.getElementById('navToggle');
+  const primaryNav = document.getElementById('primaryNav');
+  navToggle.addEventListener('click', () => {
+    const isOpen = primaryNav.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', String(isOpen));
+  });
+  primaryNav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      primaryNav.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  const form = document.getElementById('contactForm');
+  const status = document.getElementById('formStatus');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const service = document.getElementById('service').value;
+    const message = document.getElementById('message').value;
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nService: ${service}\n\n${message}`);
+    window.location.href = `mailto:digitalumbrella@proton.me?subject=${encodeURIComponent('New enquiry via Digital Umbrella site')}&body=${body}`;
+    status.classList.add('visible');
+  });
+</script>
+
+</body>
+</html>
