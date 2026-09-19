@@ -236,6 +236,12 @@
     font-family: var(--mono);
     color: var(--stamp);
   }
+  .retainer-note{
+    margin-top: 28px;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
   @media (max-width: 780px){
     .service-grid{ grid-template-columns: 1fr; }
     .card.tilt-a, .card.tilt-b{ transform: none; }
@@ -384,6 +390,23 @@
   .whatsapp-tab span{ display:none; }
   @media (min-width: 640px){ .whatsapp-tab span{ display:inline; } }
 </style>
+  <!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1764518524592513');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1764518524592513&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -456,6 +479,7 @@
         <div class="card-rate">Specialist rate · from $30/hour</div>
       </div>
     </div>
+    <p class="retainer-note">Ongoing retainer arrangements available</p>
   </div>
 </section>
 
@@ -464,7 +488,7 @@
 <section class="section" id="about">
   <div class="wrap">
     <div class="section-label">Who you're working with</div>
-    <h2>Based in Scotland, working with clients anywhere</h2>
+    <h2>Based in Scotland, working with clients Worldwide</h2>
     <div class="about-grid">
       <div class="file-photo">
         <div class="frame">
@@ -577,8 +601,23 @@
     const service = document.getElementById('service').value;
     const message = document.getElementById('message').value;
     const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nService: ${service}\n\n${message}`);
+
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'Lead');
+    }
+
     window.location.href = `mailto:digitalumbrella@proton.me?subject=${encodeURIComponent('L#2E - New enquiry via Digital Umbrella site')}&body=${body}`;
     status.classList.add('visible');
+  });
+
+  // Meta Pixel: track WhatsApp button clicks (contact section button + fixed tab)
+  // Uses event delegation on document so it catches both buttons regardless of
+  // where they sit in the page or when they're added to the DOM.
+  document.addEventListener('click', (e) => {
+    const waLink = e.target.closest('a[href*="wa.me"]');
+    if (waLink && typeof fbq !== 'undefined') {
+      fbq('track', 'Contact');
+    }
   });
 </script>
 
